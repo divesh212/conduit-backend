@@ -21,5 +21,12 @@ module.exports = {
         bio: {
             type: DT.STRING(100)
         }
+    },
+
+    getProfileResponse: function () {
+        return {
+            username: this.username,
+            bio: this.bio,
+        }
     }
 }

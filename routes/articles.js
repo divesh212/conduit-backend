@@ -38,12 +38,37 @@ route.post('/', authorization, async (req, res) => {
             body: req.body.article.body,
             userId: req.userId
         })
-        var article = await Article.findById(newArticle.id, { include: [User] })
-        await delete article.dataValues.userId
-        await delete article.dataValues.user.dataValues.password
-        res.status(201).json(article)
+
+        var article = await Article.findById(newArticle.id, {
+            include: [User]
+        })
+        res.status(201).json({
+            article: article.getArticleResponse()
+        })
     } catch (err) {
-        res.status(400).json({ error: "the article could not be added" })
+        console.log(err);
+        res.status(400).json({
+            error: "Cannot add Article"
+        })
+    }
+})
+
+route.get('/', async (req, res) => {
+    try {
+        let articles = await Article.findAll({
+            include: [User],
+            order: [
+                ['createdAt', 'DESC']
+            ]
+        })
+        res.status(200).json({
+            articles: articles.map((article) => {
+                return article.getArticleResponse()
+            }),
+            articlesCount: articles.length
+        })
+    } catch (err) {
+        res.status(400).json(err)
     }
 })
 
