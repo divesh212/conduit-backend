@@ -19,7 +19,7 @@ let authorization = async function (req, res, next) {
     if (req.headers && req.headers.authorization) {
         let token = req.headers.authorization
         try {
-            let decoded = await jwt.verify(token, 'qwerty');
+            let decoded = await jwt.verify(token, 'mysecretkey');
             req.userId = decoded.id
             next()
         } catch (err) {
@@ -53,6 +53,7 @@ route.post('/', authorization, async (req, res) => {
     }
 })
 
+//global feed
 route.get('/', async (req, res) => {
     try {
         let articles = await Article.findAll({
@@ -68,6 +69,26 @@ route.get('/', async (req, res) => {
             articlesCount: articles.length
         })
     } catch (err) {
+        res.status(400).json(err)
+    }
+})
+
+//your feed
+route.get('/feed', authorization ,async (req, res) => {
+    try {
+        let user = await User.findByPk(req.userId)
+        let folowees = await user.getFollowees()
+        let foloweesId = []
+        for(let i=0; i<folowees.length; i++) {
+            let id = folowees[i].id
+            foloweesId.push(id)
+        }
+        let articles = await Article.findAll({ where: { 
+            userId: foloweesId
+        }})
+        res.status(200).json(articles)
+    } catch (err) {
+        console.log(err)
         res.status(400).json(err)
     }
 })

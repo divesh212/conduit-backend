@@ -22,7 +22,7 @@ route.post('/login', async (req,res) => {
                 email: req.body.user.email,
                 password: req.body.user.password
             }})
-        const token = jwt.sign({id: user.id},'qwerty')
+        const token = jwt.sign({id: user.id},'mysecretkey')
         const loginResponse = {
             email: user.email,
             username: user.username,
